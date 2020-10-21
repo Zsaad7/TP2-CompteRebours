@@ -2,9 +2,10 @@ package com.example.tp2;
 
 import android.os.SystemClock;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-public class CountdownModel {
+public class CountdownModel implements Serializable {
     public final int init_val = 00;
     public int startValue;
     long startTime = SystemClock.elapsedRealtime();
@@ -27,9 +28,9 @@ public class CountdownModel {
         return startValue;
     }
 
-    public int setStartValue(int startValue) {
+    public void setStartValue(int startValue) {
         this.startValue = startValue;
-        return startValue;
+
     }
 
     public int getInit_val() {

@@ -13,13 +13,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.concurrent.Future;
+
 public class MainActivity extends AppCompatActivity {
     Button startBtn, stopBtn, R_Init_Btn;
-    TextView cdView;
+    TextView countDownView;
     public CountdownModel countdownModel = new CountdownModel();
     public Handler myHandler = new Handler();
-    public  Runnable myRunnable;
-    public int startValue , ctest=10;
+    public  Runnable myRunnableS;
+    public int startValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,68 +31,69 @@ public class MainActivity extends AppCompatActivity {
         stopBtn = findViewById(R.id.StopButton);
         R_Init_Btn = findViewById(R.id.ReInitilizeButton);
 
-         cdView = findViewById(R.id.CountDown);
-         cdView.setText(countdownModel.getInit_val()+"");
+         countDownView = findViewById(R.id.CountDown);
+        countDownView.setText(countdownModel.getInit_val()+"");
 
-         countdownModel.setStartValue(60);
-         startValue = countdownModel.getStartValue();
+        countdownModel.setStartValue(60);
+        startValue =  countdownModel.getStartValue();
 
-        myRunnable =  new Runnable() {
+        myRunnableS =  new Runnable() {
             @Override
             public void run() {
-                cdView.setText(startValue + "");
-                startValue--;
-                if(startValue<0){
-                    myHandler.postDelayed(this, 1000);
-                }else{
-                    Toast.makeText(getBaseContext(), "CountDown Atteinte ", Toast.LENGTH_LONG).show();
-                }
 
+                countDownView.setText(startValue + "");
+                startValue--;
+                if(startValue >= 0){
+                    myHandler.postDelayed(this, 1000);
+
+                }else if(startValue<0){
+                    Toast.makeText(getBaseContext(), "CountDown Atteinte ", Toast.LENGTH_LONG).show();
+                    R_Init_Btn.setEnabled(true);
+                }
             }
         };
 
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                myHandler.post(myRunnable);
+                Toast.makeText(getBaseContext(), "CountDown Launched", Toast.LENGTH_LONG).show();
+                myHandler.post(myRunnableS);
+                countDownView.setText(countdownModel.getStartValue()+"");
+              //  R_Init_Btn.setEnabled(false);
+                R_Init_Btn.setEnabled(false);
+                stopBtn.setEnabled(true);
             }
         });
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                myHandler.removeCallbacks(myRunnable);
+                Toast.makeText(getBaseContext(), "CountDown Stoped", Toast.LENGTH_LONG).show();
+                myHandler.removeCallbacks(myRunnableS);
+                startBtn.setEnabled(true);
+                R_Init_Btn.setEnabled(true);
             }
         });
         R_Init_Btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                startValue = countdownModel.getStartValue();
+                countDownView.setText(countdownModel.getStartValue()+"");
+                Toast.makeText(getBaseContext(), "CountDown Re_Initlized", Toast.LENGTH_LONG).show();
+                stopBtn.setEnabled(false);
+                startBtn.setEnabled(true);
 
-                cdView.setText(countdownModel.getStartValue()+"");
             }
         });
 
     }
 
-
-    public void startCountdown1(){
-
-        //long remainingTime = countdownModel.getRemainingTime(Integer.valueOf(cdView.getText().toString()));
-        //Toast.makeText(getBaseContext(), ""+remainingTime, Toast.LENGTH_LONG).show();
-        // cdView.setText(remainingTime +"");
-        long startValue = countdownModel.getStartValue() * 1000;
-                new CountDownTimer(startValue, 1000){
-
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                     //   millisUntilFinished = countdownModel.getStartTime();
-                        cdView.setText(millisUntilFinished/1000+"");
-                    }
-
-                    @Override
-                    public void onFinish() {
-                            cancel();
-                    }
-                }.start();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        myHandler.removeCallbacks(myRunnableS);
+        Toast.makeText(getBaseContext(), "You are Outside the App, CountDown Would be Stopped", Toast.LENGTH_LONG).show();
     }
+
+
 
 }
